@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns:rabbit="http://www.springframework.org/schema/rabbit"
+	   xmlns:context="http://www.springframework.org/schema/context"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/rabbit
+           http://www.springframework.org/schema/rabbit/spring-rabbit.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<context:component-scan base-package="com.qmcaifu.common.service"/>
+
+	<!-- 支持上传文件 -->
+	<bean id="multipartResolver"
+		  class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+		<property name="maxUploadSize" value="${file.maxUploadSize}" />
+	</bean>
+
+	<!--线程池-->
+	<bean id="threadPool"
+		  class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
+		<property name="corePoolSize" value="${tp.corePoolSize}" />
+		<property name="maxPoolSize" value="${tp.maxPoolSize}" />
+		<property name="queueCapacity" value="${tp.queueCapacity}" />
+		<property name="keepAliveSeconds" value="${tp.keepAliveSeconds}" />
+		<property name="rejectedExecutionHandler">
+			<bean class="java.util.concurrent.ThreadPoolExecutor$CallerRunsPolicy" />
+		</property>
+	</bean>
+
+	<bean id="redisPoolConfig" class="redis.clients.jedis.JedisPoolConfig">
+		<property name="maxIdle" value="${redis.maxIdle}"/>
+		<property name="maxTotal" value="${redis.maxTotal}"/>
+		<property name="maxWaitMillis" value="${redis.maxWaitMillis}"/>
+		<property name="testOnBorrow" value="${redis.testOnBorrow}"/>
+	</bean>
+    
+    <bean id="jedisPool" class="redis.clients.jedis.JedisPool">
+        <constructor-arg index="0" ref="redisPoolConfig"/>
+        <constructor-arg index="1" value="${redis.host}"/>
+        <constructor-arg index="2" value="${redis.port}" type="int"/>
+        <constructor-arg index="3" value="${redis.timeout}" type="int"/>
+        <!--<constructor-arg index="4" value="${redis.password}"/>-->
+    </bean>
+
+    <!-- 连接服务配置 -->
+    <rabbit:connection-factory id="connectionFactory"
+                               host="${mq.host}"
+                               username="${mq.uname}" password="${mq.pwd}"
+                               port="${mq.port}" channel-cache-size="${mq.ccsize}" />
+    <rabbit:admin connection-factory="connectionFactory" />
+
+	<rabbit:annotation-driven/>
+	<bean id="rabbitListenerContainerFactory"
+		  class="org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory">
+		<property name="connectionFactory" ref="connectionFactory"/>
+	</bean>
+
+</beans>
