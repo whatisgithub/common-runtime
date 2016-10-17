@@ -13,6 +13,8 @@
         <jedis.client.version>2.7.3</jedis.client.version>
         <rabbitmq.client.version>3.6.1</rabbitmq.client.version>
         <rabbitmq.spring.version>1.6.2.RELEASE</rabbitmq.spring.version>
+        <configcenter.version>1.0-SNAPSHOT</configcenter.version>
+        <dubbo.version>2.5.3</dubbo.version>
     </properties>
 
     <distributionManagement>
@@ -59,6 +61,24 @@
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
             <version>1.7.7</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.qmcaifu.configcenter.facade</groupId>
+            <artifactId>configcenter-facade</artifactId>
+            <version>${configcenter.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>dubbo</artifactId>
+            <version>${dubbo.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
     </dependencies>
